@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -32,11 +33,9 @@ class AuthService
         }
 
         // Vérifie si le rôle existe, sinon le crée
-        $role = Role::firstOrCreate(
-            ['name' => $request->role_name ?? 'user']
-        );
+        $role = $this->userRepo->getOrCreateRole($request->role_name);
         
-        $user = $this->userRepo->createUser([
+        $user = $this->userRepo->create([
             'name' => $request->name,
             'email' => $request->email,
             'role_id' => $role->id,
@@ -48,4 +47,22 @@ class AuthService
         return response()->json(['user' => $user, 'token' => $token], 201);
     }
 
+    /**
+     * fonction qui connecte un user en verifiant ces infos
+     * et lui genere un token de connexion
+     */
+    public function login($request): JsonResponse
+    {
+        
+        if (!Auth::attempt($request->only('email', 'password'))) {
+
+            return response()->json(['error' => 'identifiant invalide'], 401);
+        }
+
+        $user = $this->userRepo->findByEmail($request->email);
+
+        $token = $user->createToken('access_token')->accessToken;
+
+        return response()->json(['message'=>'connexion reussie','user' => $user,'token' => $token], 200);
+    }
 }

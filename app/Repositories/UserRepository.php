@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Contracts\Interface\UserRepositoryInterface;
 
@@ -15,13 +16,18 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         parent::__construct($user);
     }
     
-    public function createUser(array $data): User
+    public function create(array $data): User
     {
-        return User::create($data);
+        return $this->create($data);
     }
 
     public function findByEmail(string $email): User|null
     {
         return User::where("email", $email)->first();
+    }
+
+    public function getOrCreateRole(string $roleName)
+    {
+        return Role::firstOrCreate(['name' => $roleName ?? 'user']);
     }
 }

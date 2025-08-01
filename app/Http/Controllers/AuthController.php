@@ -18,4 +18,8 @@ class AuthController extends Controller
     {
         return $this->authService->register($request);
     }
+
+    public function login(Request $request) {
+        return $this->authService->login($request);
+    }
 }
