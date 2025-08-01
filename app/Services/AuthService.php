@@ -65,4 +65,20 @@ class AuthService
 
         return response()->json(['message'=>'connexion reussie','user' => $user,'token' => $token], 200);
     }
+
+    /**
+     * function de deconnexion
+     * il ferme le token actuel de user
+     */
+    public function logout($request)
+    {
+        $user = Auth::user();
+
+        if($user) {
+            $request->user()->token()->revoke();
+            return response()->json(['message'=>'deconnexion reussie'], 200);
+        }
+
+         return response()->json(['error' => 'Aucun utilisateur connecté'], 401);
+    }
 }
