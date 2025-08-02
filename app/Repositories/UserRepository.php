@@ -15,15 +15,10 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         parent::__construct($user);
     }
-    
-    public function create(array $data): User
-    {
-        return $this->create($data);
-    }
 
     public function findByEmail(string $email): User|null
     {
-        return User::where("email", $email)->first();
+        return $this->model->where("email", $email)->first();
     }
 
     public function getOrCreateRole(string $roleName)
