@@ -4,7 +4,7 @@ namespace App\Contracts\Interface;
 
 interface BaseRepositoryInterface
 {
-    public function all();
+    public function get();
     public function find($id);
     public function create(array $data);
     public function update($id, array $data);

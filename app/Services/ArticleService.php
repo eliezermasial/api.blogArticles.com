@@ -21,6 +21,13 @@ class ArticleService
         $this->articleRepo = $articleRepo;
     }
 
+    public function all()
+    {
+        $articles = $this->articleRepo->get();
+
+        return response()->json($articles);
+    }
+
     public function create($request)
     {
         $user = Auth::user();
