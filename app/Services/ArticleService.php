@@ -21,17 +21,18 @@ class ArticleService
         $this->articleRepo = $articleRepo;
     }
 
-    public function all()
+    public function all(): JsonResponse
     {
         $articles = $this->articleRepo->get();
 
         return response()->json($articles);
     }
 
-    public function create($request)
+    public function create($request): JsonResponse
     {
         $user = Auth::user();
         $author = $user->id;
+
         $slug = Str::slug($request['title']);
 
         $category = Category::firstOrCreate([
@@ -39,7 +40,7 @@ class ArticleService
             "slug" => "etude",
             "description" => "pour les etudiant",
             "is_active" => true,
-            ]);
+        ]);
 
         $article = $this->articleRepo->create([
             'content' => $request->content,
@@ -53,6 +54,30 @@ class ArticleService
         ]);
 
         return response()->json(["message"=> "article crée","article"=> $article], 200);
+    }
+
+    public function update($request, $id): JsonResponse
+    {
+        $user = Auth::user();
+        $article = $this->articleRepo->find($id);
+        
+        if($user->id != $article->author_id)
+        {
+            return response()->json(["message" => "vous n'avez pas accès à cet article"], 403);
+        }
+
+        $slug = Str::slug($request['title']);
+
+        $article = $this->articleRepo->update($id,[
+            'content' => $request->content,
+            'title' => $request->title,
+            'slug' => $slug,
+            'isActive' => true,
+            'isSharable' => false,
+            'isComment' => true
+        ]);
+
+        return response()->json(["message" => "success", "article" => $article],200);
     }
 
 }

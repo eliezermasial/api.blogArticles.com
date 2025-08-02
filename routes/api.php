@@ -16,5 +16,6 @@ Route::prefix('article')->controller(ArticleController::class)->group(function (
 {
     Route::middleware('auth:api')->get('getAll', 'index')->name('index');
     Route::middleware('auth:api')->post('create', 'create')->name('create');
+    Route::middleware('auth:api')->put('update/{article}', 'update')->name('update');
 });
 

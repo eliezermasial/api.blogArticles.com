@@ -14,7 +14,7 @@ class ArticleController extends Controller
         $this->article = $article;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         return $this->article->all();
     }
@@ -22,6 +22,11 @@ class ArticleController extends Controller
     public function create(Request $request): JsonResponse
     {
        return $this->article->create($request);
+    }
+
+    public function update(Request $request, $article): JsonResponse
+    {
+        return $this->article->update($request, $article);
     }
 
 }
