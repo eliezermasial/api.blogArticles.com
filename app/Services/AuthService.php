@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     protected $userRepo;
+
     /**
      * Create a new class instance.
      */
@@ -21,6 +22,13 @@ class AuthService
         $this->userRepo = $userRepo;
     }
 
+    /**
+    * Enregistre un nouvel utilisateur après vérification de l'email.
+    * Crée ou récupère le rôle associé, génère un token d'accès.
+    *
+    * @param mixed $request Données de la requête contenant nom, email, mot de passe, rôle.
+    * @return JsonResponse Réponse JSON avec l'utilisateur créé et son token ou message d'erreur si email existant.
+    */
     public function register($request)
     {
         //vérification si un utilisateur avec cet email existe
@@ -48,9 +56,12 @@ class AuthService
     }
 
     /**
-     * fonction qui connecte un user en verifiant ces infos
-     * et lui genere un token de connexion
-     */
+    * Authentifie un utilisateur via ses identifiants.
+    * Génère et retourne un token d'accès en cas de succès.
+    *
+    * @param mixed $request Données de la requête avec email et mot de passe.
+    * @return JsonResponse Réponse JSON avec message, utilisateur et token ou erreur d'identifiants.
+    */
     public function login($request): JsonResponse
     {
         
@@ -67,9 +78,11 @@ class AuthService
     }
 
     /**
-     * function de deconnexion
-     * il ferme le token actuel de user
-     */
+    * Déconnecte l'utilisateur actuel en révoquant son token d'accès.
+    *
+    * @param mixed $request Requête HTTP avec utilisateur authentifié.
+    * @return JsonResponse Réponse JSON confirmant la déconnexion ou erreur si utilisateur non connecté.
+    */
     public function logout($request)
     {
         $user = Auth::user();

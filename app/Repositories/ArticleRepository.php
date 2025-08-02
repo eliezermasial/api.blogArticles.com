@@ -14,9 +14,4 @@ class ArticleRepository extends BaseRepository
     {
         parent::__construct($article);
     }
-    
-    public function create(array $data): Article
-    {
-        return $this->model->create($data);
-    }
 }
