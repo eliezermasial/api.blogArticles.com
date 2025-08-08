@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Role;
+use Exception;
 use App\Models\Category;
+use App\Traits\ApiResponse;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -12,25 +13,34 @@ use App\Repositories\ArticleRepository;
 
 class ArticleService
 {
+    use ApiResponse;
+    
     protected $articleRepo;
     /**
-     * Create a new class instance.
-     */
+    * Create a new class instance.
+    */
     public function __construct(ArticleRepository $articleRepo)
     {
         $this->articleRepo = $articleRepo;
     }
 
     /**
-     * Récupère la liste complète des articles.
-     *
-     * @return JsonResponse La réponse JSON contenant tous les articles.
-     */
+    * Récupère la liste complète des articles.
+    *
+    * @return JsonResponse La réponse JSON contenant tous les articles.
+    */
     public function all(): JsonResponse
     {
-        $articles = $this->articleRepo->get();
+        try {
+            $articles = $this->articleRepo->get();
 
-        return response()->json($articles);
+            return $this->success($articles);
+
+        } catch (\Exception $e)
+        {
+            return $this->serverError("Erreur lors de la récupération des articles.");
+        }
+
     }
 
     /**
@@ -42,29 +52,36 @@ class ArticleService
     public function create($request): JsonResponse
     {
         $user = Auth::user();
-        $author = $user->id;
 
-        $slug = Str::slug($request['title']);
+        try {
+            $author = $user->id;
 
-        $category = Category::firstOrCreate([
-            "name" => "etude",
-            "slug" => "etude",
-            "description" => "pour les etudiant",
-            "is_active" => true,
-        ]);
+            $slug = Str::slug($request['title']);
 
-        $article = $this->articleRepo->create([
-            'content' => $request->content,
-            'title' => $request->title,
-            'slug' => $slug,
-            'isActive' => true,
-            'isSharable' => true,
-            'isComment' => true,
-            'author_id' => $author,
-            'category_id' => $category->id
-        ]);
+            $category = Category::firstOrCreate([
+                "name" => "etude",
+                "slug" => "etude",
+                "description" => "pour les etudiant",
+                "is_active" => true,
+            ]);
 
-        return response()->json(["message"=> "article crée","article"=> $article], 200);
+            $article = $this->articleRepo->create([
+                'content' => $request->content,
+                'title' => $request->title,
+                'slug' => $slug,
+                'isActive' => true,
+                'isSharable' => true,
+                'isComment' => true,
+                'author_id' => $author,
+                'category_id' => $category->id
+            ]);
+
+            return $this->created($article);
+            
+        } catch (Exception $e) {
+            return $this->serverError("Erreur lors de la création de l'article.");
+        }
+        
     }
 
     /**
@@ -75,33 +92,54 @@ class ArticleService
     */
     public function getArticle($id): JsonResponse
     {
-        $article = $this->articleRepo->find($id);
+        try {
+            $article = $this->articleRepo->find($id);
+            
+            if(!$article) {
+                return $this->notFound();
+            }
 
-        return response()->json($article,200);
+            return $this->success($article);
+
+        } catch (\Exception $e) {
+            
+            return $this->serverError("Erreur lors de la récupération de l'article.");
+        }
+        
     }
 
     public function update($request, $id): JsonResponse
     {
         $user = Auth::user();
-        $article = $this->articleRepo->find($id);
+        try {
+            $article = $this->articleRepo->find($id);
+
+            if (!$article) {
+                return $this->notFound("Article non trouvé.");
+            }
         
-        if($user->id != $article->author_id)
-        {
-            return response()->json(["message" => "vous n'avez pas accès à cet article"], 403);
+            if($user->id != $article->author_id) {
+                return $this->forbidden("Vous n'êtes pas autorisé à modifier cet article.");
+            }
+
+            $slug = Str::slug($request['title']);
+
+            $article = $this->articleRepo->update($id,[
+                'content' => $request->content,
+                'title' => $request->title,
+                'slug' => $slug,
+                'isActive' => true,
+                'isSharable' => false,
+                'isComment' => true
+            ]);
+
+            return $this->success($article);
+
+        } catch (Exception $e) {
+            
+            return $this->serverError("Erreur lors de la mise à jour de l'article.");
         }
 
-        $slug = Str::slug($request['title']);
-
-        $article = $this->articleRepo->update($id,[
-            'content' => $request->content,
-            'title' => $request->title,
-            'slug' => $slug,
-            'isActive' => true,
-            'isSharable' => false,
-            'isComment' => true
-        ]);
-
-        return response()->json(["message" => "success", "article" => $article],200);
     }
 
 }

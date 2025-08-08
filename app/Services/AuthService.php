@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Role;
-use App\Models\User;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    use ApiResponse;
+
     protected $userRepo;
 
     /**
@@ -31,28 +32,33 @@ class AuthService
     */
     public function register($request)
     {
-        //vérification si un utilisateur avec cet email existe
-        $user= $this->userRepo->findByEmail($request->email);
-        
-        if ($user) {
-            return response()->json([
-                "message" => "email existant"
-            ],409);
+        try {
+            //vérification si un utilisateur avec cet email existe
+            $user= $this->userRepo->findByEmail($request->email);
+            
+            if ($user) {
+                return $this->conflict("Un utilisateur avec cet email existe déjà.");
+            }
+
+            // Vérifie si le rôle existe, sinon le crée
+            $role = $this->userRepo->getOrCreateRole($request->role_name);
+            
+            $user = $this->userRepo->create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'role_id' => $role->id,
+                'password' => Hash::make($request->password)
+            ]);
+
+            $token = $user->createToken('access_token')->accessToken;
+
+            return $this->created(['user' => $user, 'token' => $token], "Utilisateur créé avec succès.");
+
+        } catch (\Exception $e) {
+            
+            return $this->serverError("Erreur lors de la creation de l'utilisateur.");
         }
 
-        // Vérifie si le rôle existe, sinon le crée
-        $role = $this->userRepo->getOrCreateRole($request->role_name);
-        
-        $user = $this->userRepo->create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role_id' => $role->id,
-            'password' => Hash::make($request->password)
-        ]);
-
-        $token = $user->createToken('access_token')->accessToken;
-
-        return response()->json(['user' => $user, 'token' => $token], 201);
     }
 
     /**
@@ -64,17 +70,24 @@ class AuthService
     */
     public function login($request): JsonResponse
     {
-        
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        try {
 
-            return response()->json(['error' => 'identifiant invalide'], 401);
+            if (!Auth::attempt($request->only('email', 'password'))) {
+
+                return $this->unauthorized('identifiant invalide');
+            }
+
+            $user = $this->userRepo->findByEmail($request->email);
+
+            $token = $user->createToken('access_token')->accessToken;
+
+            return $this->success(['message'=>'connexion reussie','user' => $user,'token' => $token]);
+
+        } catch (\Exception $e) {
+            
+            return $this->serverError("Erreur lors de la connexion.");
         }
-
-        $user = $this->userRepo->findByEmail($request->email);
-
-        $token = $user->createToken('access_token')->accessToken;
-
-        return response()->json(['message'=>'connexion reussie','user' => $user,'token' => $token], 200);
+        
     }
 
     /**
@@ -89,9 +102,10 @@ class AuthService
 
         if($user) {
             $request->user()->token()->revoke();
-            return response()->json(['message'=>'deconnexion reussie'], 200);
+
+            return $this->success(null, 'Déconnexion réussie');
         }
 
-         return response()->json(['error' => 'Aucun utilisateur connecté'], 401);
+        return $this->unauthorized('Aucun utilisateur connecté');
     }
 }
