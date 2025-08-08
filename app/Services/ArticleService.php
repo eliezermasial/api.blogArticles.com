@@ -142,4 +142,29 @@ class ArticleService
 
     }
 
+    /**
+    * Supprime un article à partir de son identifiant.
+    *
+    * @param int $id L'identifiant de l'article à supprimer.
+    * @return JsonResponse La réponse JSON confirmant la suppression.
+    */
+    public function delete($id): JsonResponse
+    {
+        try {
+            $article = $this->articleRepo->find($id);
+
+            if (!$article) {
+                return $this->notFound("Article non trouvé.");
+            }
+            
+            $this->articleRepo->delete($id);
+
+            return $this->deleted("Article supprimé avec succès.");
+
+        } catch (Exception $e) {
+
+            return $this->serverError("Erreur lors de la suppression de l'article.");
+        }
+    }
+
 }

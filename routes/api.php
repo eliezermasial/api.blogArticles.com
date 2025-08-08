@@ -18,5 +18,6 @@ Route::prefix('article')->controller(ArticleController::class)->group(function (
     Route::middleware('auth:api')->post('create', 'store')->name('article.create');
     Route::middleware('auth:api')->post('show/{article}', 'show')->name('article.show');
     Route::middleware('auth:api')->put('update/{article}', 'update')->name('article.update');
+    Route::middleware('auth:api')->delete('delete/{article}', 'destroy')->name('article.delete');
 });
 

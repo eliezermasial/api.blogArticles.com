@@ -35,4 +35,8 @@ class ArticleController extends Controller
         return $this->article->update($request, $article);
     }
 
+    public function destroy($article): JsonResponse
+    {
+        return $this->article->delete($article);
+    }
 }
