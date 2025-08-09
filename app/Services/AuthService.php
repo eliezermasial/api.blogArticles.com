@@ -30,7 +30,7 @@ class AuthService
     * @param mixed $request Données de la requête contenant nom, email, mot de passe, rôle.
     * @return JsonResponse Réponse JSON avec l'utilisateur créé et son token ou message d'erreur si email existant.
     */
-    public function register($request)
+    public function register($request): JsonResponse
     {
         try {
             //vérification si un utilisateur avec cet email existe

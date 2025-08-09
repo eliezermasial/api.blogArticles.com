@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Article;
-use App\Contracts\Interface\UserRepositoryInterface;
 
 class ArticleRepository extends BaseRepository
 {
