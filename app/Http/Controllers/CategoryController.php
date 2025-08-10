@@ -14,9 +14,9 @@ class CategoryController extends Controller
         $this->category = $category;
     }
     
-    public function index()
+    public function index(): JsonResponse
     {
-        // Logic to get all categories
+        return $this->category->all();
     }
 
     public function store(Request $request): JsonResponse
@@ -24,18 +24,4 @@ class CategoryController extends Controller
         return $this->category->create($request);
     }
 
-    public function show($category)
-    {
-        // Logic to show a specific category
-    }
-
-    public function update(Request $request, $category)
-    {
-        // Logic to update a specific category
-    }
-
-    public function destroy($category)
-    {
-        // Logic to delete a specific category
-    }
 }
