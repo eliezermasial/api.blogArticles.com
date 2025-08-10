@@ -24,4 +24,9 @@ class CategoryController extends Controller
         return $this->category->create($request);
     }
 
+    public function show($category): JsonResponse
+    {
+        return $this->category->getCategory($category);
+    }
+
 }

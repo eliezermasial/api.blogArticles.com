@@ -76,4 +76,28 @@ class CategoryService
         }
     }
 
+    /**
+    * Affiche une catégorie spécifique.
+    *
+    * @param int $categoryId L'ID de la catégorie à afficher.
+    * @return JsonResponse La réponse JSON contenant la catégorie demandée.
+    */
+    public function getCategory($categoryId): JsonResponse
+    {
+        try {
+
+            $category = $this->categoryRepo->find($categoryId);
+
+            if (!$category) {
+                return $this->notFound("Category not found.");
+            }
+
+            return $this->success($category, "Category retrieved successfully.");
+
+        } catch (Exception $e) {
+
+            return $this->serverError("Error retrieving category: " . $e->getMessage());
+        }
+    }
+
 }
