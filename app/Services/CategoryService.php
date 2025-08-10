@@ -133,4 +133,27 @@ class CategoryService
         }
     }
 
+    /**
+    * Supprime une catégorie spécifique.
+    * @param int $categorie L'ID de la catégorie à supprimer.
+    * @return JsonResponse La réponse JSON contenant le message de succès ou d'erreur.
+    */
+    public function delete($categorie): JsonResponse
+    {
+        try {
+            $category = $this->categoryRepo->find($categorie);
+
+            if (!$category) {
+                return $this->notFound("Category not found.");
+            }
+
+            $this->categoryRepo->delete($categorie);
+
+            return $this->success(null, "Category deleted successfully.");
+
+        } catch (Exception $e) {
+
+            return $this->serverError("Error updating category: " . $e->getMessage());
+        }
+    }
 }

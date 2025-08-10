@@ -34,4 +34,8 @@ class CategoryController extends Controller
         return $this->category->update($request, $category);
     }
 
+    public function destroy($category): JsonResponse
+    {
+        return $this->category->delete($category);
+    }
 }
