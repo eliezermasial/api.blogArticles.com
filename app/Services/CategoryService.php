@@ -100,4 +100,37 @@ class CategoryService
         }
     }
 
+    /**
+    * Met à jour une catégorie spécifique.
+    *
+    * @param mixed $request Les données de la requête (name, description, etc.).
+    * @param int $categoryId L'ID de la catégorie à mettre à jour.
+    * @return JsonResponse La réponse JSON contenant le message de succès ou d'erreur.
+    */
+    public function update($request, $categoryId): JsonResponse
+    {
+        try {
+            $category = $this->categoryRepo->find($categoryId);
+
+            if (!$category) {
+                return $this->notFound("Category not found.");
+            }
+
+            $slug = Str::slug($request->name);
+
+            $category = $this->categoryRepo->update($categoryId, [
+                'name' => $request->name,
+                'slug' => $slug,
+                'description' => $request->description,
+                'is_active' => $request->is_active ?? true,
+            ]);
+
+            return $this->success($category, "Category updated successfully.");
+
+        } catch (Exception $e) {
+
+            return $this->serverError("Error updating category: " . $e->getMessage());
+        }
+    }
+
 }

@@ -29,4 +29,9 @@ class CategoryController extends Controller
         return $this->category->getCategory($category);
     }
 
+    public function update(Request $request, $category): JsonResponse
+    {
+        return $this->category->update($request, $category);
+    }
+
 }
