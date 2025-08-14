@@ -2,7 +2,7 @@
 namespace App\Services;
 
 
-class {{name}} Service
+class {{name}}
 {
     // Implémentez la logique du service ici
 }

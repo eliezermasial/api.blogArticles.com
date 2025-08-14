@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('name', 225);
             $table->string('email', 225);
             $table->unsignedBigInteger('article_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('web_site', 225)->nullable();
             $table->foreign('article_id')->references('id')->on('articles')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

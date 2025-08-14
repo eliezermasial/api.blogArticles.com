@@ -17,10 +17,16 @@ class Comment extends Model
         'name',
         'email',
         'article_id',
+        'user_id',
         'is_active',
         'web_site',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+    
     public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class, 'article_id');

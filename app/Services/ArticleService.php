@@ -58,13 +58,6 @@ class ArticleService
 
             $slug = Str::slug($request['title']);
 
-            $category = Category::firstOrCreate([
-                "name" => "etude",
-                "slug" => "etude",
-                "description" => "pour les etudiant",
-                "is_active" => true,
-            ]);
-
             $article = $this->articleRepo->create([
                 'content' => $request->content,
                 'title' => $request->title,
@@ -73,7 +66,7 @@ class ArticleService
                 'isSharable' => true,
                 'isComment' => true,
                 'author_id' => $author,
-                'category_id' => $category->id
+                'category_id' => $request->category_id
             ]);
 
             return $this->created($article);
