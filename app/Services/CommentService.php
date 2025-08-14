@@ -127,7 +127,11 @@ class CommentService
         try {
             $comment = $this->commentRepo->find($id);
 
-            if($comment->user_id != $user->id && $comment->user->role->name !== Role::ADMIN) {
+            $isCommentOwner = $comment->user_id == $user->id;
+            $isAdmin = $comment->user && $comment->user->role->name === Role::ADMIN;
+            $isArticleOwner = $comment->article && $comment->article->user_id == $user->id;
+            
+            if(!($isCommentOwner || $isAdmin || $isArticleOwner)) {
                 return $this->error('Unauthorized action', 403);
             }
 
