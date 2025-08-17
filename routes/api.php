@@ -35,11 +35,12 @@ Route::prefix('category')->controller(CategoryController::class)->group(function
 });
 
 
-Route::prefix('article/{articleId}/comment')->controller(CommentsController::class)->group(function ()
+Route::prefix('article/{articleId}/comment/{parentId?}')->controller(CommentsController::class)->group(function ()
 {
-    Route::get('getAll', 'index')->name('comment.index');
     Route::get('show/{id}', 'show')->name('comment.show');
     Route::middleware('auth:api')->post('create', 'store')->name('comment.create');
     Route::middleware('auth:api')->put('update/{id}', 'update')->name('comment.update');
     Route::middleware('auth:api')->delete('delete/{id}', 'destroy')->name('comment.delete');
 });
+
+Route::get('article/{articleId}/comments', [CommentsController::class, 'index'])->name('comment.index');

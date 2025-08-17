@@ -20,6 +20,7 @@ class Comment extends Model
         'user_id',
         'is_active',
         'web_site',
+        'parent_id'
     ];
 
     public function user(): BelongsTo
@@ -30,5 +31,17 @@ class Comment extends Model
     public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class, 'article_id');
+    }
+
+    //Relation pour les réponses
+    public function replies(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
+    }
+
+    //Relation pour accéder au parent
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Comment::class, 'parent_id');
     }
 }

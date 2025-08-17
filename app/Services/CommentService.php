@@ -48,7 +48,7 @@ class CommentService
     * @param int $articleId The ID of the article to which the comment belongs.
     * @return JsonResponse The response containing the created comment or an error message.
     */
-    public function create($request, $articleId): JsonResponse
+    public function create($request, $articleId, $parentId = null): JsonResponse
     {
         $user = Auth::user();
         try {
@@ -67,6 +67,7 @@ class CommentService
                 'user_id' => $user ? $user->id : null,
                 'is_active' => true,
                 'web_site' => "ww.eliezerr",
+                'parent_id' => $parentId
             ]);
 
             return $this->created($comment, 'Commentaire ajouté avec succès');
@@ -112,7 +113,6 @@ class CommentService
 
             return $this->serverError('Error updating update'. $e->getMessage());
         }
-        
     }
 
     /**

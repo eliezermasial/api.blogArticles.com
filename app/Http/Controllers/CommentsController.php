@@ -29,9 +29,9 @@ class CommentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $articleId)
+    public function store(Request $request, $articleId, $parentId = null)
     {
-        return $this->comment->create($request->all(), $articleId);
+        return $this->comment->create($request->all(), $articleId, $parentId);
     }
 
     /**

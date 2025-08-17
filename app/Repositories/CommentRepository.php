@@ -21,6 +21,8 @@ class CommentRepository extends BaseRepository
     */
     public function getByArticleId($articleId): Collection
     {
-        return $this->model->where('article_id', $articleId)->orderByDesc('created_at')->get();
+        return $this->model->where('article_id', $articleId)
+        ->whereNull('parent_id')->with('replies') 
+        ->orderByDesc('created_at')->get();
     }
 }
